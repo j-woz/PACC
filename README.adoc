@@ -1,2 +1,40 @@
-# PACC
+= PACC
+
 ECP PACC scripts and workflows
+
+== Workflow +test-awj/builddb+
+
+(From Jasper)
+
+The scripts are in bin/. The main script is builddb.pl which reads species.list, creates missing directories in database/, launches jobs to the queue designed to populate the database, and reads the outputs of these jobs to actually populate it. This script calls other scripts: obabel (a code written by others), qcscript.pl (our script to set up quantum chemistry jobs), and qq (our script to submit jobs to the queue). qcscript.pl in turn uses the commercial quantum chemistry codes gaussian and molpro (installed via softenv on blues) and our scripts gread.pl and mread.pl that read outputs from the commercial codes. So there is some complexity of code-dependency to think about. Some of the quantum chemistry jobs require other jobs to finish before they can be launched. This dependency is currently handled inside qcscript.pl. Finally, some of the quantum chemistry jobs fail, and we don’t yet have great ways of dealing with that.
+
+== Usage
+
+On Blues:
+
+1. Make a local copy of test-awj
++
+----
+cp -r /lcrc/project/PACC/test-awj ~
+cd ~/test-awj/build-db
+----
+2. Run:
++
+----
+bin/builddb.pl species.list
+----
+
+Current error:
+----
+mv: cannot stat `obabel-guess.xyz': No such file or directory
+tail: cannot open `/blues/gpfs/home/wozniak/proj/test-awj/builddb/database/H/H///obabel-guess.xyz' for reading: No such file or directory
+sh: qq: command not found
+cp: cannot stat `queue.x': No such file or directory
+ QC script reporting:
+ Launching job 1 of 2.
+
+Doing: H2, canonical SMILES = , multiplicity = 1
+Database path: H/H//
+mv: cannot stat `obabel-guess.xyz': No such file or directory
+sh: qq: command not found
+----
